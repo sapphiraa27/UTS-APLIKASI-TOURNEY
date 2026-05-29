@@ -1,0 +1,454 @@
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease;
+}
+
+/* SweetAlert2 Elegant Sporty Theme */
+.swal2-popup {
+  font-family: 'Outfit', sans-serif !important;
+  border-radius: 24px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+body.dark-theme .swal2-popup {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+.swal2-title { font-weight: 800 !important; font-size: 1.5rem !important; }
+.swal2-html-container { font-weight: 500 !important; font-size: 1rem !important; color: var(--text-muted) !important; }
+
+.swal2-confirm {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  padding: 12px 28px !important;
+  background: var(--ion-color-primary) !important;
+  box-shadow: 0 8px 15px rgba(var(--ion-color-primary-rgb), 0.3) !important;
+}
+
+.swal2-cancel {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.swal2-input {
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-main) !important;
+  color: var(--text-main) !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+}
+
+.swal2-input:focus {
+  border-color: var(--ion-color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.2) !important;
+}
+
+/* Layout Utilities */
+.glass-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+}
+
+body.dark-theme .glass-panel {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.animate-pop {
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ============================================ */
+/* SweetAlert2 - Luxury Match Update Form       */
+/* ============================================ */
+.swal2-container {
+  z-index: 30000 !important;
+}
+
+.luxury-swal-popup {
+  border-radius: 30px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  font-family: 'Outfit', sans-serif !important;
+  width: 90% !important;
+  max-width: 400px !important;
+  padding: 28px 24px !important;
+
+  .swal2-title {
+    font-weight: 900 !important;
+    font-size: 1.15rem !important;
+    color: var(--text-main) !important;
+    margin-bottom: 8px !important;
+  }
+
+  .swal2-html-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Score card area */
+  .swal-score-card {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: start !important;
+    gap: 12px !important;
+    background: var(--bg-main) !important;
+    padding: 24px 16px !important;
+    border-radius: 24px !important;
+    border: 1px solid var(--border-color) !important;
+    margin-bottom: 20px !important;
+  }
+
+  .vs-column {
+    font-weight: 900 !important;
+    color: var(--ion-color-primary) !important;
+    font-size: 0.9rem !important;
+    opacity: 0.35 !important;
+    padding-top: 50px !important;
+    text-align: center !important;
+  }
+
+  .team-slot {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .team-initial {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 16px !important;
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border-color) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 900 !important;
+    color: var(--ion-color-primary) !important;
+    font-size: 1.3rem !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+  }
+
+  .team-label {
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    color: var(--text-muted) !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    line-height: 1.3 !important;
+    max-width: 100px !important;
+    word-break: break-word !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .score-input {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 20px !important;
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border-color) !important;
+    text-align: center !important;
+    font-size: 1.8rem !important;
+    font-weight: 900 !important;
+    color: var(--ion-color-primary) !important;
+    outline: none !important;
+    transition: all 0.3s ease !important;
+    font-family: 'Outfit', sans-serif !important;
+    -moz-appearance: textfield !important;
+    margin-top: 4px !important;
+
+    &:focus {
+      border-color: var(--ion-color-primary) !important;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15) !important;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none !important;
+      margin: 0 !important;
+    }
+  }
+
+  /* Status selector */
+  .status-selector-box {
+    text-align: left !important;
+
+    .status-title {
+      font-size: 0.7rem !important;
+      font-weight: 900 !important;
+      color: var(--text-muted) !important;
+      margin-bottom: 12px !important;
+      display: block !important;
+      letter-spacing: 1.5px !important;
+      text-transform: uppercase !important;
+    }
+
+    .status-pills {
+      display: flex !important;
+      gap: 8px !important;
+    }
+
+    .status-pill {
+      flex: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      padding: 14px 10px !important;
+      border-radius: 14px !important;
+      border: 2px solid var(--border-color) !important;
+      background: var(--bg-main) !important;
+      color: var(--text-muted) !important;
+      font-weight: 800 !important;
+      font-size: 0.75rem !important;
+      font-family: 'Outfit', sans-serif !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      user-select: none !important;
+
+      &:hover {
+        border-color: var(--ion-color-primary) !important;
+        background: rgba(16, 185, 129, 0.03) !important;
+      }
+
+      &.active {
+        border-color: var(--ion-color-primary) !important;
+        background: rgba(16, 185, 129, 0.08) !important;
+        color: var(--ion-color-primary) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+      }
+    }
+
+    .pill-dot {
+      width: 8px !important;
+      height: 8px !important;
+      border-radius: 50% !important;
+      flex-shrink: 0 !important;
+
+      &.upcoming { background: #3b82f6 !important; }
+      &.live { background: #ef4444 !important; animation: livePulse 1.5s infinite !important; }
+      &.finished { background: #9ca3af !important; }
+    }
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  }
+
+  /* Buttons */
+  .luxury-confirm-btn {
+    background: var(--ion-color-primary) !important;
+    border-radius: 16px !important;
+    padding: 15px 36px !important;
+    font-weight: 900 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35) !important;
+    font-family: 'Outfit', sans-serif !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .luxury-cancel-btn {
+    background: var(--bg-main) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+    padding: 15px 24px !important;
+    font-weight: 800 !important;
+    font-size: 0.9rem !important;
+    font-family: 'Outfit', sans-serif !important;
+  }
+}
+
+/* SweetAlert luxury form inputs (for Add Match, etc.) */
+.luxury-swal-popup .swal-select-input,
+.luxury-swal-popup .swal-text-input {
+  width: 100% !important;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-main) !important;
+  color: var(--text-main) !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  font-family: 'Outfit', sans-serif !important;
+  outline: none !important;
+  transition: all 0.3s ease !important;
+  box-sizing: border-box !important;
+  margin-top: 4px !important;
+}
+
+.luxury-swal-popup .swal-select-input:focus,
+.luxury-swal-popup .swal-text-input:focus {
+  border-color: var(--ion-color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.luxury-swal-popup .swal-text-input::placeholder {
+  color: var(--text-muted) !important;
+  font-weight: 500 !important;
+}
+
+/* ============================================ */
+/* LUXURY FORM & SIMULATION CARD (MODAL)        */
+/* ============================================ */
+.swal-luxury-form {
+  text-align: left !important;
+  padding: 5px !important;
+  
+  .form-group {
+    margin-bottom: 20px !important;
+    
+    label {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-size: 0.7rem !important;
+      font-weight: 800 !important;
+      color: var(--ion-color-primary) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1px !important;
+      margin-bottom: 8px !important;
+      
+      ion-icon { font-size: 1.1rem !important; }
+    }
+  }
+
+  .lux-input-group {
+    background: rgba(var(--ion-color-dark-rgb), 0.05) !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 14px !important;
+    padding: 0 14px !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    
+    &:focus-within {
+      background: var(--bg-card) !important;
+      border-color: var(--ion-color-primary) !important;
+      box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.1) !important;
+      transform: translateY(-2px) !important;
+    }
+
+    input {
+      border: none !important;
+      background: transparent !important;
+      width: 100% !important;
+      padding: 14px 0 !important;
+      font-size: 0.95rem !important;
+      font-weight: 700 !important;
+      color: var(--text-main) !important;
+      outline: none !important;
+      font-family: 'Outfit', sans-serif !important;
+    }
+  }
+
+  .simulation-card {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.04) 100%) !important;
+    border: 2px solid rgba(16, 185, 129, 0.25) !important;
+    border-radius: 22px !important;
+    padding: 22px !important;
+    margin-top: 25px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.1) !important;
+
+    .sim-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      margin-bottom: 16px !important;
+      
+      ion-icon { color: var(--ion-color-success) !important; font-size: 1.2rem !important; }
+      span {
+        font-size: 0.75rem !important;
+        font-weight: 900 !important;
+        color: var(--ion-color-success) !important;
+        letter-spacing: 1.5px !important;
+      }
+    }
+
+    .sim-controls {
+      display: flex !important;
+      align-items: center !important;
+      
+      .sim-input-box {
+        flex: 1 !important;
+        background: var(--bg-card) !important;
+        border: 2px solid rgba(16, 185, 129, 0.2) !important;
+        border-radius: 14px !important;
+        padding: 10px 18px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        
+        input {
+          border: none !important;
+          background: transparent !important;
+          width: 45px !important;
+          font-size: 1.5rem !important;
+          font-weight: 900 !important;
+          color: var(--ion-color-success) !important;
+          text-align: center !important;
+          outline: none !important;
+        }
+        
+        span {
+          font-size: 0.75rem !important;
+          font-weight: 800 !important;
+          color: var(--text-muted) !important;
+          text-transform: uppercase !important;
+        }
+      }
+    }
+
+    .sim-footer-note {
+      margin-top: 14px !important;
+      font-size: 0.65rem !important;
+      color: var(--text-muted) !important;
+      line-height: 1.4 !important;
+      display: flex !important;
+      gap: 8px !important;
+      align-items: flex-start !important;
+      
+      ion-icon { font-size: 0.9rem !important; flex-shrink: 0 !important; }
+    }
+  }
+}

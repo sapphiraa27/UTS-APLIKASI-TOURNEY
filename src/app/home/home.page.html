@@ -1,0 +1,642 @@
+<!-- SPLASH SCREEN -->
+<div class="splash-screen" *ngIf="showSplash">
+  <div class="splash-content animate-pop">
+    <div class="splash-logo">
+      <img src="assets/icon/logo.png" alt="Logo">
+    </div>
+    <h1>TOURNEY</h1>
+    <p>Local Sports Tournament Manager</p>
+    <div class="splash-loader"></div>
+  </div>
+</div>
+
+<ion-content [fullscreen]="true" *ngIf="!showSplash">
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="brand" (click)="toggleAdminMode()">
+        <div class="logo-box">
+          <img src="assets/icon/logo.png" alt="Logo">
+        </div>
+        <div class="logo-text">
+          <p>{{ tournamentConfig.subtitle }}</p>
+          <h2>{{ tournamentConfig.name }} <ion-badge color="danger" *ngIf="isAdminMode">ADMIN</ion-badge></h2>
+        </div>
+      </div>
+      <div class="action-row">
+        <button *ngIf="isAdminMode" class="icon-btn glass-panel" (click)="openTournamentSettings()">
+          <ion-icon name="settings-outline"></ion-icon>
+        </button>
+        <button class="icon-btn glass-panel" (click)="toggleDarkMode()">
+          <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+        </button>
+        <button class="icon-btn glass-panel position-relative" (click)="isNotifModalOpen = true">
+          <ion-icon name="notifications-outline"></ion-icon>
+          <span class="notif-badge"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SKELETON LOADING -->
+    <div class="skeleton-grid" *ngIf="isLoading">
+      <div class="sk-card glass-panel" *ngFor="let s of [1,2,3]">
+         <div class="sk-header shimmer"></div>
+         <div class="sk-body shimmer"></div>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW AREA -->
+    <div class="main-content" *ngIf="!isLoading">
+
+      <!-- VIEW: MATCHES -->
+      <div class="matches-view animate-fade" *ngIf="viewMode === 'matches'">
+        <div class="section-title">
+          <h3>Jadwal Pertandingan</h3>
+          <p>Pantau jadwal dan lokasi tanding tim kamu.</p>
+        </div>
+
+        <!-- SUB-VIEW TOGGLE -->
+        <div class="sub-toggle">
+          <button [class.active]="matchSubView === 'schedule'" (click)="matchSubView = 'schedule'">
+            <ion-icon name="calendar-outline"></ion-icon> Jadwal
+          </button>
+          <button [class.active]="matchSubView === 'bracket'" (click)="matchSubView = 'bracket'">
+            <ion-icon name="trophy-outline"></ion-icon> Bracket
+          </button>
+        </div>
+
+        <!-- SUB-VIEW: SCHEDULE -->
+        <div *ngIf="matchSubView === 'schedule'" class="animate-fade">
+          <div class="admin-top-actions" *ngIf="isAdminMode" style="display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap;">
+            <button class="primary-btn" style="margin:0; padding:12px 18px; font-size:0.75rem; flex:1; min-width:120px;" (click)="addMatch()">
+              <ion-icon name="add-circle-outline"></ion-icon> Tambah
+            </button>
+            <button class="primary-btn" style="margin:0; padding:12px 18px; font-size:0.75rem; flex:1; min-width:120px; background: #f59e0b; box-shadow: 0 10px 25px rgba(245,158,11,0.35);" (click)="simulateAllScores()">
+              <ion-icon name="flash-outline"></ion-icon> Simulasi
+            </button>
+            <button class="primary-btn" style="margin:0; padding:12px 18px; font-size:0.75rem; flex:1; min-width:120px; background: #6366f1; box-shadow: 0 10px 25px rgba(99,102,241,0.35);" (click)="exportMatchesPDF()">
+              <ion-icon name="document-text-outline"></ion-icon> Export PDF
+            </button>
+          </div>
+
+          <!-- MATCH SCHEDULE NAVIGATOR -->
+          <div class="schedule-nav">
+            <div class="schedule-scroll">
+              <div class="day-pill" [class.active]="selectedMatchday === 'all'" (click)="selectedMatchday = 'all'">
+                <div class="day-icon"><ion-icon name="grid-outline"></ion-icon></div>
+                <span class="day-label">Semua</span>
+                <span class="day-count">{{ matches.length }}</span>
+              </div>
+              <div class="day-pill" *ngFor="let day of getMatchDays()" 
+                   [class.active]="selectedMatchday === day"
+                   (click)="selectedMatchday = day">
+                <div class="day-number">{{ formatDayShort(day).day }}</div>
+                <span class="day-weekday">{{ formatDayShort(day).weekday }}</span>
+                <span class="day-month">{{ formatDayShort(day).month }}</span>
+                <span class="day-count">{{ getMatchCount(day) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="match-card glass-panel" *ngFor="let match of getFilteredMatches()">
+            <div class="match-header">
+              <span class="badge" [ngClass]="match.status.toLowerCase()">{{ match.status }}</span>
+              <small><ion-icon name="calendar-outline"></ion-icon> {{ formatDate(match.date) }} • {{ match.time }} WIB</small>
+            </div>
+            <div class="match-teams">
+              <div class="team-side">
+                 <div class="team-shield">{{ match.homeTeam.charAt(0) }}</div>
+                 <b>{{ match.homeTeam }}</b>
+              </div>
+              <div class="score-board">
+                <span *ngIf="match.status === 'Finished'">{{ match.homeScore }} - {{ match.awayScore }}</span>
+                <span *ngIf="match.status !== 'Finished'">VS</span>
+              </div>
+              <div class="team-side">
+                 <div class="team-shield">{{ match.awayTeam.charAt(0) }}</div>
+                 <b>{{ match.awayTeam }}</b>
+              </div>
+            </div>
+            <!-- HALF SCORES -->
+            <div class="half-scores" *ngIf="match.status === 'Finished' && match.homeHalf1 !== undefined">
+              <span>{{ tournamentConfig.periodLabel }} 1: {{ match.homeHalf1 }} - {{ match.awayHalf1 }}</span>
+              <span class="break-tag" *ngIf="tournamentConfig.breakLabel !== '-'">{{ tournamentConfig.breakLabel }}</span>
+              <span>{{ tournamentConfig.periodLabel }} 2: {{ match.homeHalf2 }} - {{ match.awayHalf2 }}</span>
+            </div>
+            <div class="match-footer">
+              <ion-icon name="location-outline"></ion-icon> {{ match.location }}
+              <span class="match-duration">• {{ getMatchDurationLabel() }}</span>
+            </div>
+            <div class="admin-actions-box" style="margin-top:15px; border-top: 1px dashed var(--border-color); padding-top:12px; display:flex; gap:8px;" *ngIf="isAdminMode">
+               <button class="primary-btn" style="margin:0; padding:12px; font-size:0.8rem; flex:1;" (click)="editMatch(match)">
+                 <ion-icon name="create-outline"></ion-icon> Update Skor
+               </button>
+               <button class="danger-btn" style="margin:0; padding:12px; font-size:0.8rem; width:auto; flex-shrink:0;" (click)="deleteMatch(match)">
+                 <ion-icon name="trash-outline"></ion-icon>
+               </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-VIEW: BRACKET -->
+        <div *ngIf="matchSubView === 'bracket'" class="animate-fade">
+          <div class="bracket-container">
+            <div class="bracket-header glass-panel">
+              <ion-icon name="trophy"></ion-icon>
+              <h4>{{ tournamentConfig.name }} BRACKET</h4>
+              <p>Fase Gugur • 8 Tim</p>
+              
+              <!-- EXPORT PDF FOR USERS & ADMIN -->
+              <div class="bracket-user-tools" *ngIf="isBracketDetermined()" style="margin-top: 15px; display:flex; gap:8px; justify-content:center;">
+                <button class="primary-btn" style="margin:0; padding:10px 16px; font-size:0.75rem; background: #6366f1; box-shadow: 0 8px 20px rgba(99,102,241,0.35);" (click)="exportMatchesPDF()">
+                  <ion-icon name="document-text-outline"></ion-icon> Export PDF Bracket
+                </button>
+              </div>
+
+              <!-- ADMIN BRACKET TOOLS -->
+              <div class="admin-bracket-tools" *ngIf="isAdminMode" style="margin-top: 15px; display:flex; gap:8px; justify-content:center;">
+                <button class="primary-btn" style="margin:0; padding:10px 16px; font-size:0.75rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);" (click)="shuffleTournament()">
+                  <ion-icon name="shuffle-outline"></ion-icon> 🎲 Acak
+                </button>
+                <button class="primary-btn" style="margin:0; padding:10px 16px; font-size:0.75rem; background: rgba(245, 158, 11, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.5);" (click)="resetBracket()">
+                  <ion-icon name="trash-outline"></ion-icon> 🔄 Reset Total
+                </button>
+              </div>
+            </div>
+
+            <div class="bracket-scroll">
+              <div class="bracket-grid">
+                <!-- ROUND: Quarter Finals -->
+                <div class="bracket-round">
+                  <div class="round-title">Perempat Final</div>
+                  <div class="bracket-match" *ngFor="let m of bracket.quarterFinals; let i = index" 
+                       [class.done]="m.done" 
+                       [class.admin-editable]="isAdminMode"
+                       (click)="editBracketMatch(m, 'quarter', i)">
+                    <div class="bm-team" [class.winner]="m.done && m.homeScore! > m.awayScore!">
+                      <span class="bm-name">{{ m.home }}</span>
+                      <span class="bm-score">{{ m.homeScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-team" [class.winner]="m.done && m.awayScore! > m.homeScore!">
+                      <span class="bm-name">{{ m.away }}</span>
+                      <span class="bm-score">{{ m.awayScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-halves" *ngIf="m.done && m.homeHalf1 !== undefined">
+                      <small>P1: {{ m.homeHalf1 }}-{{ m.awayHalf1 }}</small>
+                      <small>P2: {{ m.homeHalf2 }}-{{ m.awayHalf2 }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ROUND: Semi Finals -->
+                <div class="bracket-round">
+                  <div class="round-title">Semi Final</div>
+                  <div class="bracket-match" *ngFor="let m of bracket.semiFinals; let i = index" 
+                       [class.done]="m.done"
+                       [class.admin-editable]="isAdminMode"
+                       (click)="editBracketMatch(m, 'semi', i)">
+                    <div class="bm-team" [class.winner]="m.done && m.homeScore! > m.awayScore!">
+                      <span class="bm-name">{{ m.home }}</span>
+                      <span class="bm-score">{{ m.homeScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-team" [class.winner]="m.done && m.awayScore! > m.homeScore!">
+                      <span class="bm-name">{{ m.away }}</span>
+                      <span class="bm-score">{{ m.awayScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-halves" *ngIf="m.done && m.homeHalf1 !== undefined">
+                      <small>P1: {{ m.homeHalf1 }}-{{ m.awayHalf1 }}</small>
+                      <small>P2: {{ m.homeHalf2 }}-{{ m.awayHalf2 }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ROUND: Final -->
+                <div class="bracket-round final-round">
+                  <div class="round-title">🏆 Final</div>
+                  <div class="bracket-match final-match" 
+                       [class.done]="bracket.final.done"
+                       [class.admin-editable]="isAdminMode"
+                       (click)="editBracketMatch(bracket.final, 'final')">
+                    <div class="bm-team" [class.winner]="bracket.final.done && bracket.final.homeScore! > bracket.final.awayScore!">
+                      <span class="bm-name">{{ bracket.final.home }}</span>
+                      <span class="bm-score">{{ bracket.final.homeScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-team" [class.winner]="bracket.final.done && bracket.final.awayScore! > bracket.final.homeScore!">
+                      <span class="bm-name">{{ bracket.final.away }}</span>
+                      <span class="bm-score">{{ bracket.final.awayScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-halves" *ngIf="bracket.final.done && bracket.final.homeHalf1 !== undefined">
+                      <small>P1: {{ bracket.final.homeHalf1 }}-{{ bracket.final.awayHalf1 }}</small>
+                      <small>P2: {{ bracket.final.homeHalf2 }}-{{ bracket.final.awayHalf2 }}</small>
+                    </div>
+                  </div>
+
+                  <div class="round-title" style="margin-top:24px;">🥉 Perebutan Juara 3</div>
+                  <div class="bracket-match" 
+                       [class.done]="bracket.thirdPlace.done"
+                       [class.admin-editable]="isAdminMode"
+                       (click)="editBracketMatch(bracket.thirdPlace, 'third')">
+                    <div class="bm-team">
+                      <span class="bm-name">{{ bracket.thirdPlace.home }}</span>
+                      <span class="bm-score">{{ bracket.thirdPlace.homeScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-team">
+                      <span class="bm-name">{{ bracket.thirdPlace.away }}</span>
+                      <span class="bm-score">{{ bracket.thirdPlace.awayScore ?? '-' }}</span>
+                    </div>
+                    <div class="bm-halves" *ngIf="bracket.thirdPlace.done && bracket.thirdPlace.homeHalf1 !== undefined">
+                      <small>P1: {{ bracket.thirdPlace.homeHalf1 }}-{{ bracket.thirdPlace.awayHalf1 }}</small>
+                      <small>P2: {{ bracket.thirdPlace.homeHalf2 }}-{{ bracket.thirdPlace.awayHalf2 }}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: TEAMS (Status) -->
+      <div class="teams-view animate-fade" *ngIf="viewMode === 'teams'">
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h3>Daftar Tim Peserta</h3>
+            <p>Tim yang sudah mendaftar dan diverifikasi.</p>
+          </div>
+          <button *ngIf="isAdminMode" class="primary-btn" style="margin:0; padding:10px 16px; font-size:0.7rem; width:auto; background: #6366f1; box-shadow: 0 8px 20px rgba(99,102,241,0.3);" (click)="exportTeamsPDF()">
+            <ion-icon name="document-text-outline"></ion-icon> Export PDF
+          </button>
+        </div>
+
+        <div class="team-card glass-panel" *ngFor="let team of teams" (click)="openTeamDetail(team)">
+          <div class="tc-left">
+            <div class="logo-placeholder">
+               <ion-icon name="shield-half-outline"></ion-icon>
+            </div>
+            <div class="tc-info">
+              <h4>{{ team.name }}</h4>
+              <p>Capt: {{ team.captain }}</p>
+            </div>
+          </div>
+          <div class="tc-right">
+            <span class="status-stamp" [class.verified]="team.status === 'Verified'">
+              {{ team.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="teams.length === 0">
+           <ion-icon name="sad-outline"></ion-icon>
+           <p>Belum ada tim yang mendaftar.</p>
+        </div>
+      </div>
+
+  <!-- NOTIFICATION MODAL -->
+  <ion-modal [isOpen]="isNotifModalOpen" (didDismiss)="isNotifModalOpen = false" class="dialog-modal">
+    <ng-template>
+      <div class="dialog-wrapper">
+        <div class="modal-header glass-panel">
+          <button class="back-btn" (click)="isNotifModalOpen = false"><ion-icon name="close"></ion-icon></button>
+          <h2>Pengumuman Panitia</h2>
+        </div>
+        
+        <div class="notif-scroll-area">
+          <div class="notif-card glass-panel" *ngFor="let n of notifications">
+            <div class="n-icon" [ngClass]="n.type">
+              <ion-icon [name]="n.type === 'alert' ? 'alert-circle' : 'information-circle'"></ion-icon>
+            </div>
+            <div class="n-content">
+              <h4>{{ n.title }}</h4>
+              <p>{{ n.message }}</p>
+              <small>{{ formatDate(n.date) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+      <!-- VIEW: REGISTRATION FORM -->
+      <div class="register-view animate-fade" *ngIf="viewMode === 'register'">
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h3>Registrasi Tim Baru</h3>
+            <p>Daftarkan tim untuk {{ tournamentConfig.name }}.</p>
+          </div>
+          <button class="text-btn" style="width:auto; margin:0; font-size:0.8rem; color:var(--ion-color-danger);" (click)="logoutUser()" *ngIf="isUserLoggedIn">
+            <ion-icon name="log-out-outline" style="font-size:1.2rem; vertical-align:middle;"></ion-icon> Keluar
+          </button>
+        </div>
+
+        <div class="form-card glass-panel">
+          <div class="luxury-field">
+            <small>Nama Tim</small>
+            <div class="field-box">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <input type="text" [(ngModel)]="registrationForm.name" placeholder="Masukkan nama tim">
+            </div>
+          </div>
+
+          <div class="luxury-field">
+            <small>Nama Kapten Tim</small>
+            <div class="field-box">
+              <ion-icon name="person-outline"></ion-icon>
+              <input type="text" [(ngModel)]="registrationForm.captain" placeholder="Nama lengkap kapten">
+            </div>
+          </div>
+
+          <div class="luxury-field">
+            <small>Nomor Kontak (WhatsApp)</small>
+            <div class="field-box">
+              <ion-icon name="call-outline"></ion-icon>
+              <input type="tel" [(ngModel)]="registrationForm.contact" placeholder="Masukkan Nomor WhatsApp">
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="players-section">
+            <div class="p-header">
+              <h4>Daftar Pemain</h4>
+              <button class="add-btn" (click)="addPlayerField()">+ Tambah</button>
+            </div>
+
+            <div class="player-row" *ngFor="let p of registrationForm.players; let i = index">
+               <div class="p-number">{{ i + 1 }}</div>
+               <div class="p-input-box">
+                 <input type="text" class="p-name" [(ngModel)]="p.name" placeholder="Nama Pemain">
+                 <input type="text" class="p-punggung" [(ngModel)]="p.number" [placeholder]="tournamentConfig.playerLabel">
+               </div>
+               <button class="del-btn" *ngIf="registrationForm.players.length > 1" (click)="removePlayerField(i)">
+                 <ion-icon name="trash-outline"></ion-icon>
+               </button>
+            </div>
+          </div>
+
+          <button class="primary-btn btn-full" (click)="submitRegistration()">Daftarkan Tim Sekarang</button>
+        </div>
+      </div>
+
+      <!-- VIEW: PROFILE (USER DASHBOARD) -->
+      <div class="profile-view animate-fade" *ngIf="viewMode === 'profile'">
+        <div class="section-title">
+          <h3>Profil Saya</h3>
+          <p>Kelola akun dan pantau status tim Anda.</p>
+        </div>
+
+        <!-- PROFILE CARD -->
+        <div class="glass-panel profile-card-box">
+          <div class="profile-avatar-ring">
+            <ion-icon name="person"></ion-icon>
+          </div>
+          <h2 class="profile-username">{{ currentUserName || '-' }}</h2>
+          <p class="profile-email">{{ authUsername || 'Belum ada email' }}</p>
+          
+          <div class="profile-actions-row">
+            <button class="profile-action-btn reset-btn" (click)="openProfileResetPassword()">
+              <ion-icon name="key-outline"></ion-icon> Ganti Sandi
+            </button>
+            <button class="profile-action-btn logout-btn" (click)="logoutUser()">
+              <ion-icon name="log-out-outline"></ion-icon> Keluar
+            </button>
+          </div>
+        </div>
+
+        <!-- TEAM SECTION HEADER -->
+        <div class="profile-section-header">
+           <ion-icon name="shield-checkmark"></ion-icon>
+           <h3>Tim Terdaftar</h3>
+        </div>
+        
+        <div *ngIf="getUserTeam() as userTeam; else noTeam">
+          <div class="glass-panel profile-team-card">
+            <!-- Team Header -->
+            <div class="profile-team-header">
+              <div class="profile-team-info">
+                <div class="profile-team-icon">
+                   <ion-icon name="shield-half-outline"></ion-icon>
+                </div>
+                <div>
+                  <h3 class="profile-team-name">{{ userTeam.name }}</h3>
+                  <p class="profile-team-captain"><ion-icon name="person-circle-outline"></ion-icon> Kapten: {{ userTeam.captain }}</p>
+                  <p class="profile-team-contact"><ion-icon name="call-outline"></ion-icon> {{ userTeam.contact }}</p>
+                </div>
+              </div>
+              <span class="status-stamp" [class.verified]="userTeam.status === 'Verified'">
+                {{ userTeam.status }}
+              </span>
+            </div>
+            
+            <!-- Player Roster -->
+            <div class="profile-roster-section">
+              <div class="profile-roster-label">
+                 <ion-icon name="people"></ion-icon>
+                 <span>Daftar Pemain ({{ userTeam.players.length }})</span>
+              </div>
+              <div class="profile-player-list">
+                 <div *ngFor="let p of userTeam.players; let i = index" class="profile-player-row">
+                   <div class="profile-player-num">{{ p.number || '-' }}</div>
+                   <span class="profile-player-name">{{ p.name }}</span>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noTeam>
+          <div class="glass-panel profile-no-team">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <p>Anda belum mendaftarkan tim.</p>
+            <button class="primary-btn" (click)="switchView('register')">Daftar Tim Sekarang</button>
+          </div>
+        </ng-template>
+        <div style="height: 100px;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADMIN AUTH MODAL -->
+  <ion-modal [isOpen]="isAdminAuthOpen" (didDismiss)="isAdminAuthOpen = false" class="auth-modal">
+    <ng-template>
+      <div class="auth-container">
+        <div class="auth-box glass-panel">
+          <ion-icon name="lock-closed" class="auth-icon"></ion-icon>
+          <h2>Panitia Gate</h2>
+          <p>Area khusus panitia untuk verifikasi pendaftaran.</p>
+          <input type="password" [(ngModel)]="adminPIN" placeholder="Masukkan PIN Panitia (admin123)">
+          <button class="primary-btn btn-full" (click)="checkAdminPIN()">Akses Dasbor</button>
+          <button class="text-btn" (click)="isAdminAuthOpen = false">Batal</button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <!-- USER AUTH MODAL -->
+  <ion-modal [isOpen]="isAuthModalOpen" (didDismiss)="isAuthModalOpen = false" class="auth-modal">
+    <ng-template>
+      <ion-content>
+        <div class="auth-container">
+          <div class="auth-box glass-panel text-center">
+            <div class="big-shield" style="margin: 0 auto 15px; width: 60px; height: 60px; background: var(--bg-card); display:flex; align-items:center; justify-content:center; border-radius:15px; font-size:2rem; color:var(--ion-color-primary);">
+               <ion-icon name="person"></ion-icon>
+            </div>
+            <h2 *ngIf="userAuthMode === 'login'">Login Kapten</h2>
+            <h2 *ngIf="userAuthMode === 'register'">Register Akun</h2>
+            <h2 *ngIf="userAuthMode === 'forgot'">Lupa Kata Sandi</h2>
+            
+            <p *ngIf="userAuthMode === 'login'" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Masuk untuk mendaftarkan tim Anda.</p>
+            <p *ngIf="userAuthMode === 'register'" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Buat akun baru untuk mulai mendaftar.</p>
+            <p *ngIf="userAuthMode === 'forgot'" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Buat kata sandi baru untuk akun Anda.</p>
+            
+            <input *ngIf="userAuthMode === 'register'" type="text" placeholder="Nama Lengkap" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 12px; outline: none;">
+            
+            <input *ngIf="userAuthMode !== 'forgot'" type="email" [(ngModel)]="authUsername" placeholder="Email / Username" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 12px; outline: none;">
+            <input *ngIf="userAuthMode !== 'forgot'" type="password" [(ngModel)]="authPassword" placeholder="Password" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 25px; outline: none;">
+            
+            <input *ngIf="userAuthMode === 'forgot'" type="email" [(ngModel)]="forgotUsername" placeholder="Email / Username" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 12px; outline: none;">
+            <input *ngIf="userAuthMode === 'forgot'" type="password" [(ngModel)]="forgotPassword" placeholder="Kata Sandi Baru" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 12px; outline: none;">
+            <input *ngIf="userAuthMode === 'forgot'" type="password" [(ngModel)]="forgotConfirm" placeholder="Konfirmasi Sandi Baru" style="width:100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-main); text-align: left; font-weight: 600; color: var(--text-main); margin-bottom: 25px; outline: none;">
+            
+            <button class="primary-btn btn-full" *ngIf="userAuthMode !== 'forgot'" (click)="simulateUserLogin()">{{ userAuthMode === 'login' ? 'Masuk' : 'Daftar' }}</button>
+            <button class="primary-btn btn-full" *ngIf="userAuthMode === 'forgot'" (click)="simulateForgotPassword()">Ubah Kata Sandi</button>
+            
+            <button class="text-btn" *ngIf="userAuthMode !== 'forgot'" style="margin-top:20px; font-size:0.8rem;" (click)="userAuthMode = userAuthMode === 'login' ? 'register' : 'login'">
+               {{ userAuthMode === 'login' ? 'Belum punya akun? Daftar di sini' : 'Sudah punya akun? Login' }}
+            </button>
+            
+            <button class="text-btn" *ngIf="userAuthMode === 'login'" style="margin:5px 0 0; font-size:0.8rem; color:var(--text-muted);" (click)="userAuthMode = 'forgot'">
+               Lupa Kata Sandi?
+            </button>
+            
+            <button class="text-btn" *ngIf="userAuthMode === 'forgot'" style="margin-top:20px; font-size:0.8rem;" (click)="userAuthMode = 'login'">
+               Kembali ke Login
+            </button>
+            
+            <button class="text-btn" style="margin-top:5px; color:var(--text-muted); font-size:0.8rem;" (click)="isAuthModalOpen = false">Batal</button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- TEAM DETAIL MODAL -->
+  <ion-modal [isOpen]="isTeamDetailOpen" (didDismiss)="isTeamDetailOpen = false" class="detail-modal">
+    <ng-template>
+      <div class="modal-scroll-wrapper">
+        <div class="modal-container" *ngIf="selectedTeam">
+          <div class="modal-header glass-panel">
+            <button class="back-btn" (click)="isTeamDetailOpen = false"><ion-icon name="chevron-down"></ion-icon></button>
+            <h2>Detail Tim</h2>
+          </div>
+          
+          <div class="team-profile text-center">
+            <div class="big-shield"><ion-icon name="shield"></ion-icon></div>
+            <h2>{{ selectedTeam.name }}</h2>
+            <span class="status-stamp" [class.verified]="selectedTeam.status === 'Verified'">{{ selectedTeam.status }}</span>
+          </div>
+
+          <div class="info-list glass-panel">
+             <div class="i-row"><span>Kapten</span> <b>{{ selectedTeam.captain }}</b></div>
+             <div class="i-row"><span>Kontak</span> <b>{{ selectedTeam.contact }}</b></div>
+             <div class="i-row"><span>Terdaftar</span> <b>{{ formatDate(selectedTeam.registeredDate) }}</b></div>
+          </div>
+
+          <div class="roster-box glass-panel">
+            <h3>Susunan Pemain ({{ selectedTeam.players.length }})</h3>
+            <div class="roster-item" *ngFor="let p of selectedTeam.players">
+              <div class="r-no">{{ p.number }}</div>
+              <div class="r-name">{{ p.name }}</div>
+            </div>
+          </div>
+
+          <!-- ADMIN ACTION -->
+          <div class="admin-actions-box" *ngIf="isAdminMode">
+            <button class="primary-btn btn-full admin-verify-btn" 
+                    *ngIf="selectedTeam.status === 'Pending'"
+                    (click)="verifyTeam(selectedTeam, $event)">
+              <ion-icon name="checkmark-circle"></ion-icon> Verifikasi Tim Ini
+            </button>
+            <button class="danger-btn btn-full" (click)="deleteTeam(selectedTeam)">
+              <ion-icon name="trash"></ion-icon> Hapus Tim
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+
+
+  <!-- CHAT MODAL -->
+  <ion-modal [isOpen]="isChatModalOpen" (didDismiss)="isChatModalOpen = false" class="chat-modal stretch-modal">
+    <ng-template>
+      <div class="chat-wrapper">
+        <div class="modal-header glass-panel">
+          <button class="back-btn" (click)="isChatModalOpen = false"><ion-icon name="chevron-down"></ion-icon></button>
+          <div style="flex:1; text-align:center;">
+             <h2 style="margin:0; font-size:1.1rem; font-weight:800;">{{ isAdminMode ? 'Pusat Bantuan' : 'Chat Admin' }}</h2>
+             <span style="font-size:0.7rem; color:var(--ion-color-success);">● Online</span>
+          </div>
+          <div style="width:40px;"></div> <!-- Spacer -->
+        </div>
+        
+        <div class="chat-scroll-area">
+          <div class="empty-state" *ngIf="chatMessages.length === 0" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <ion-icon name="chatbox-ellipses-outline" style="font-size:3rem; opacity:0.3; margin-bottom:10px"></ion-icon>
+            <p style="color:var(--text-muted); font-size:0.8rem;">Kirim pesan pertamamu...</p>
+          </div>
+          
+          <div *ngFor="let msg of chatMessages" class="chat-bubble-container" [ngClass]="{'mine': (isAdminMode && msg.role === 'Admin') || (!isAdminMode && msg.role === 'User')}">
+             <div class="chat-bubble">
+               <div class="sender-name">{{ msg.sender }}</div>
+               <div class="msg-text">{{ msg.message }}</div>
+               <div class="msg-time">{{ formatDate(msg.timestamp) }} {{ msg.timestamp.substring(11, 16) }}</div>
+             </div>
+          </div>
+        </div>
+
+        <div class="chat-input-area glass-panel">
+          <input type="text" [(ngModel)]="chatInput" placeholder="Ketik pesan..." (keyup.enter)="sendMessage()" class="chat-input-field">
+          <button class="send-btn primary-btn" (click)="sendMessage()">
+            <ion-icon name="send"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>
+
+<!-- CHAT FAB -->
+<div class="chat-fab glass-panel animate-pop" *ngIf="(isUserLoggedIn || isAdminMode) && !isChatModalOpen" (click)="openChat()">
+  <ion-icon name="chatbubbles"></ion-icon>
+</div>
+
+<!-- BOTTOM TABS BAR -->
+<div class="bottom-tabs glass-panel" *ngIf="!showSplash">
+  <div class="tab-item" [class.active]="viewMode === 'matches'" (click)="switchView('matches')">
+    <div class="icon-box"><ion-icon name="calendar"></ion-icon></div>
+    <span>Matches</span>
+  </div>
+  
+  <div class="tab-item register-floater" [class.active]="viewMode === 'register'" *ngIf="!isUserLoggedIn" (click)="switchView('register')">
+    <div class="circle-btn">
+       <ion-icon name="add"></ion-icon>
+    </div>
+    <span>Daftar</span>
+  </div>
+
+  <div class="tab-item register-floater" [class.active]="viewMode === 'profile'" *ngIf="isUserLoggedIn" (click)="switchView('profile')">
+    <div class="circle-btn">
+       <ion-icon name="person"></ion-icon>
+    </div>
+    <span>Profil</span>
+  </div>
+
+  <div class="tab-item" [class.active]="viewMode === 'teams'" (click)="switchView('teams')">
+    <div class="icon-box"><ion-icon name="shield"></ion-icon></div>
+    <span>Teams</span>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+// Ionic Variables and Theming. For more info, please see:
+// http://ionicframework.com/docs/theming/
+
+/** Ionic CSS Variables **/
+:root {
+  /** primary (Emerald Green for Futsal/Turf) **/
+  --ion-color-primary: #10b981;
+  --ion-color-primary-rgb: 16,185,129;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #0e9c6d;
+  --ion-color-primary-tint: #28c08e;
+
+  /** secondary (Coral/Orange accent for energy) **/
+  --ion-color-secondary: #f97316;
+  --ion-color-secondary-rgb: 249,115,22;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255,255,255;
+  --ion-color-secondary-shade: #db6513;
+  --ion-color-secondary-tint: #fa812d;
+
+  /** tertiary **/
+  --ion-color-tertiary: #3b82f6;
+  --ion-color-tertiary-rgb: 59,130,246;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255,255,255;
+  --ion-color-tertiary-shade: #3472d8;
+  --ion-color-tertiary-tint: #4f8ff7;
+
+  /** success **/
+  --ion-color-success: #2dd4bf;
+  --ion-color-success-rgb: 45,212,191;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255,255,255;
+  --ion-color-success-shade: #28baba;
+  --ion-color-success-tint: #42d8c5;
+
+  /** warning **/
+  --ion-color-warning: #eab308;
+  --ion-color-warning-rgb: 234,179,8;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255,255,255;
+  --ion-color-warning-shade: #ce9d07;
+  --ion-color-warning-tint: #ecbb21;
+
+  /** danger **/
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239,68,68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255,255,255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  /** dark **/
+  --ion-color-dark: #1e293b;
+  --ion-color-dark-rgb: 30,41,59;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255,255,255;
+  --ion-color-dark-shade: #1a2434;
+  --ion-color-dark-tint: #353e4f;
+
+  /** medium **/
+  --ion-color-medium: #92949c;
+  --ion-color-medium-rgb: 146,148,156;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255,255,255;
+  --ion-color-medium-shade: #808289;
+  --ion-color-medium-tint: #9d9fa6;
+
+  /** light **/
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244,245,248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0,0,0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  // CUSTOM THEME VARIABLES FOR SPORTY APP
+  --bg-main: #f1f5f9; // slate 50
+  --bg-card: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-main: #0f172a; // slate 900
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0; // slate 200
+  --shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-theme {
+  --ion-color-primary: #10b981;
+  --ion-color-secondary: #f97316;
+
+  --bg-main: #020617; // slate 950
+  --bg-card: #0f172a; // slate 900
+  --bg-secondary: #1e293b; // slate 800
+  --text-main: #f8fafc; // slate 50
+  --text-secondary: #cbd5e1; // slate 300
+  --text-muted: #94a3b8; // slate 400
+  --border-color: #334155; // slate 700
+  --shadow-color: rgba(0, 0, 0, 0.3);
+
+  --ion-background-color: var(--bg-main);
+  --ion-text-color: var(--text-main);
+  --ion-item-background: var(--bg-card);
+  --ion-card-background: var(--bg-card);
+  --ion-toolbar-background: var(--bg-card);
+}
